@@ -2,7 +2,7 @@
 Repository for Particle ID and Energy Regression on vinavx2 @ CERN
 
 
-Root files can be found @ /afs/cern.ch/user/a/adipilat/public . They're obtained with NTUPLIZER, after running step3 with TICL and saving Tracksters.
+Root files can be found @ /afs/cern.ch/user/a/adipilat/public . They're obtained with NTUPLIZER, after running step3 with TICL and saving Tracksters. An example of step3(withTICL) and step4(NTUPLIZER) are included in the repository. To set everything for production, refer to this branch of my cmssw fork: https://github.com/tonydp03/cmssw/tree/PIDandER_TICL .
 
 The model is a CNN that splits in two branches at the end and outputs PID and ER for 4 classes (electron, gamma, muon, charged pion).
 
