@@ -22,7 +22,6 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(1000000),
-    output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
@@ -98,6 +97,7 @@ process.generator = cms.EDProducer("CloseByParticleGunProducer",
     ),
     Verbosity = cms.untracked.int32(0),
     firstRun = cms.untracked.uint32(1),
+    AddAntiParticle = cms.bool(False),
     psethack = cms.string('Random particles in front of HGCAL')
 )
 
