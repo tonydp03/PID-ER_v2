@@ -36,7 +36,7 @@ process.ana = cms.EDAnalyzer('HGCalTracksterPID',
                              rawRecHits = cms.bool(False),
                              readCaloParticles = cms.bool(True),
                              storeGunParticles = cms.bool(True),
-			     storeGenParticleOrigin = cms.bool(True),
+			                 storeGenParticleOrigin = cms.bool(True),
                              storeGenParticleExtrapolation = cms.bool(True),
                              storePCAvariables = cms.bool(False),
                              storeElectrons = cms.bool(False),
@@ -47,7 +47,10 @@ process.ana = cms.EDAnalyzer('HGCalTracksterPID',
                              dEdXWeights = dEdX.weights,
                              layerClusterPtThreshold = cms.double(-1),  # All LayerCluster belonging to a multicluster are saved; this Pt threshold applied to the others
                              TestParticleFilter = ParticleFilterBlock.ParticleFilter,
-		             verbose=cms.bool(True)
+                             doTracksters = cms.bool(True),
+                             storeCPMatching = cms.bool(True),
+                             forPIDOnly = cms.bool(True),
+		                     verbose=cms.bool(True)
 )
 
 process.ana.TestParticleFilter.protonEMin = cms.double(100000)
