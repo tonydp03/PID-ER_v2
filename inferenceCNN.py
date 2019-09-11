@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import sys
 import tensorflow as tf
 import keras
@@ -10,6 +8,8 @@ from keras import optimizers
 import os
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 
 from keras import backend as K
@@ -19,6 +19,7 @@ import itertools
 
 from tqdm import tqdm
 
+from PIL import Image
 
 width = 50
 height = 10
@@ -29,7 +30,7 @@ save_dir = '/data/user/adipilat/ParticleID/models/'
 plot_dir = '/data/user/adipilat/ParticleID/plots/'
 padding = 'padding' + str(height)
 model_name= padding +'_model'
-history_name = padding + '_history'
+history_name = model_name + '_history'
 
 
 # This dictionary should be extended to new classes and antiparticles
@@ -41,6 +42,8 @@ class_names = np.array(['gamma', 'electron', 'muon', 'pion_c'])
 data_array = []
 pid_array = []
 en_array = []
+
+samples = []
 
 # read dataset
 files = [f for f in os.listdir(dataset_dir) if f.endswith("h5")]
@@ -76,6 +79,10 @@ for name in tqdm(files):
         data_array.append(image)
         pid_array.append(pid)
         en_array.append(en_value)    
+        if(i == n_events_start+1):
+            img = image[:,:,0]
+            img2 = np.transpose(img, (1, 0))
+            plt.imsave(plot_dir + 'sample_' + name + '.pdf', img, format='pdf')
 
     print("File", name, " processed")
 
@@ -172,10 +179,10 @@ cnf_matrix = confusion_matrix(pid_array, pid_predicted)
 np.set_printoptions(precision=2)
 
 # Plot normalized confusion matrix
-plt.figure(0)
+fig0 = plt.figure(0)
 plot_confusion_matrix(cnf_matrix, classes=class_names, normalize=True, title='Normalized confusion matrix')
-plt.savefig(plot_dir + model_name + 'confusion_matrix.pdf', format='pdf')
-plt.show()
+plt.savefig(plot_dir + model_name + '_confusion_matrix.pdf', format='pdf')
+#fig0.show()
 
 
 #gamma's energy
@@ -186,8 +193,8 @@ plt.xlabel('True Energy', labelpad=8, fontsize=14)
 plt.ylabel('Predicted Energy', labelpad=10, fontsize=14)
 plt.plot([0,450],[0,450], color='black')
 plt.grid(linestyle=':')
-plt.savefig(plot_dir + model_name + 'gammaEn.pdf', format='pdf')
-fig1.show()
+plt.savefig(plot_dir + model_name + '_gammaEn.pdf', format='pdf')
+#fig1.show()
 
 #electron's energy
 fig2 = plt.figure(2)
@@ -197,8 +204,8 @@ plt.xlabel('True Energy', labelpad=8, fontsize=14)
 plt.ylabel('Predicted Energy', labelpad=10, fontsize=14)
 plt.plot([0,450],[0,450], color='black')
 plt.grid(linestyle=':')
-plt.savefig(plot_dir + model_name + 'electronEn.pdf', format='pdf')
-fig2.show()
+plt.savefig(plot_dir + model_name + '_electronEn.pdf', format='pdf')
+#fig2.show()
 
 #muon's energy
 fig3 = plt.figure(3)
@@ -208,8 +215,8 @@ plt.xlabel('True Energy', labelpad=8, fontsize=14)
 plt.ylabel('Predicted Energy', labelpad=10, fontsize=14)
 plt.plot([0,450],[0,450], color='black')
 plt.grid(linestyle=':')
-plt.savefig(plot_dir + model_name + 'muonEn.pdf', format='pdf')
-fig3.show()
+plt.savefig(plot_dir + model_name + '_muonEn.pdf', format='pdf')
+#fig3.show()
 
 #pion_c's energy
 fig4 = plt.figure(4)
@@ -219,8 +226,8 @@ plt.xlabel('True Energy', labelpad=8, fontsize=14)
 plt.ylabel('Predicted Energy', labelpad=10, fontsize=14)
 plt.plot([0,450],[0,450], color='black')
 plt.grid(linestyle=':')
-plt.savefig(plot_dir + model_name + 'pion_cEn.pdf', format='pdf')
-fig4.show()
+plt.savefig(plot_dir + model_name + '_pion_cEn.pdf', format='pdf')
+#fig4.show()
 
 file = pd.read_hdf(save_dir + history_name + ".h5", "history") 
 print(file.head())
@@ -252,8 +259,8 @@ plt.grid(linestyle=':')
 plt.xlabel('Epoch', labelpad=8, fontsize=14)
 plt.ylabel('Accuracy', labelpad=10, fontsize=14)
 plt.legend(loc='lower right')
-plt.savefig(plot_dir + model_name + 'pid_accuracy.pdf', format='pdf')
-fig5.show()
+plt.savefig(plot_dir + model_name + '_pid_accuracy.pdf', format='pdf')
+#fig5.show()
 
 fig6 = plt.figure(6)
 plt.plot(n_epochs, train_loss, '-b', label='Training')
@@ -263,8 +270,8 @@ plt.grid(linestyle=':')
 plt.xlabel('Epoch', labelpad=8, fontsize=14)
 plt.ylabel('Loss', labelpad=10, fontsize=14)
 plt.legend(loc='upper right')
-plt.savefig(plot_dir + model_name + 'total_loss.pdf', format='pdf')
-fig6.show()
+plt.savefig(plot_dir + model_name + '_total_loss.pdf', format='pdf')
+#fig6.show()
 
 fig7 = plt.figure(7)
 plt.plot(n_epochs, train_loss, '-g', label='Total')
@@ -275,8 +282,8 @@ plt.grid(linestyle=':')
 plt.xlabel('Epoch', labelpad=8, fontsize=14)
 plt.ylabel('Loss', labelpad=10, fontsize=14)
 plt.legend(loc='upper right')
-plt.savefig(plot_dir + model_name + 'training_loss.pdf', format='pdf')
-fig7.show()
+plt.savefig(plot_dir + model_name + '_training_loss.pdf', format='pdf')
+#fig7.show()
 
 fig8 = plt.figure(8)
 plt.plot(n_epochs, val_loss, '-g', label='Total')
@@ -287,5 +294,5 @@ plt.grid(linestyle=':')
 plt.xlabel('Epoch', labelpad=8, fontsize=14)
 plt.ylabel('Loss', labelpad=10, fontsize=14)
 plt.legend(loc='upper right')
-plt.savefig(plot_dir + 'validation_loss.pdf', format='pdf')
-fig8.show()
+plt.savefig(plot_dir + model_name + '_validation_loss.pdf', format='pdf')
+#fig8.show()

@@ -1,5 +1,3 @@
-# coding: utf-8
-
 import sys
 import tensorflow as tf
 import keras
@@ -15,7 +13,7 @@ from keras import backend as K
 from tqdm import tqdm
 
 
-batch_size = 256
+batch_size = 512
 width = 50
 height = 10
 channels = 3
@@ -25,7 +23,7 @@ dataset_dir = '/data/user/adipilat/ParticleID/genEvts/'
 save_dir = '/data/user/adipilat/ParticleID/models/'
 padding = 'padding' + str(height)
 model_name= padding +'_model'
-history_name = padding + '_history'
+history_name = model_name + '_history'
 
 # This dictionary should be extended to new classes and antiparticles
 class_labels = {22:0, 11:1, 13:2, 211:3}
@@ -91,7 +89,7 @@ print('Creating model...')
 def tree_model():
 
     input_img = Input(shape=(width, height, channels), name='input')
-    
+
     conv = Conv2D(3, (5,1), activation='relu', padding='same', kernel_initializer='random_uniform', data_format='channels_last', name='conv1')(input_img)
     conv = Conv2D(3, (3,3), activation='relu', padding='same', kernel_initializer='random_uniform', data_format='channels_last', name='conv2')(conv)
     conv = Conv2D(3, (3,3), activation='relu', padding='same', kernel_initializer='random_uniform', data_format='channels_last', name='conv3')(conv)
@@ -103,15 +101,15 @@ def tree_model():
 
     dense_id = Dense(64, activation='relu', kernel_initializer='random_uniform', name='dense_id1')(dense)
     dense_id = Dense(16, activation='relu', kernel_initializer='random_uniform', name='dense_id2')(dense_id)
-    pid = Dense(classes, activation='softmax', kernel_initializer='random_uniform', name='pid_output')(dense_id)
+    pid = Dense(classes, kernel_initializer='random_uniform', activation='softmax', name='pid_output')(dense_id)
 
-    dense_er = Dense(64, activation='relu', kernel_initializer='random_uniform', name='dense_er1')(dense)
-    dense_er = Dense(8, activation='relu', kernel_initializer='random_uniform', name='dense_er2')(dense_er)
-    enreg = Dense(1, name='enreg_output')(dense_er)
+    dense_er = Dense(64, activation='tanh', kernel_initializer='random_uniform', name='dense_er1')(dense)
+    dense_er = Dense(8, activation='tanh', kernel_initializer='random_uniform', name='dense_er2')(dense_er)
+    enreg = Dense(1, kernel_initializer='random_uniform', name='enreg_output')(dense_er)
 
     model = Model(inputs=input_img, outputs=[pid, enreg])
 
-    model.compile(loss={'pid_output': 'categorical_crossentropy', 'enreg_output': 'mse'}, loss_weights={'pid_output': 1, 'enreg_output': 2}, optimizer='adam', metrics={'pid_output': 'accuracy', 'enreg_output': 'mse'})
+    model.compile(loss={'pid_output': 'categorical_crossentropy', 'enreg_output': 'mse'}, loss_weights={'pid_output': 1, 'enreg_output': 1}, optimizer='adam', metrics={'pid_output': 'accuracy', 'enreg_output': 'mse'})
     return model
 
 model = tree_model()
